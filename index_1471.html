@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Majestic Level | Next-Gen Tactical Training Systems</title>
+    <meta name="description" content="Revolutionary firearm training combining VR, 3D printing, and AI. Eliminate negative training habits with quantifiable standards.">
+    <link rel="icon" type="image/webp" href="MajesticLogo.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+    
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F4D03F;
+            --gold-dim: rgba(212, 175, 55, 0.4);
+            --gold-glow: rgba(212, 175, 55, 0.15);
+            --bg: #0a0a0a;
+            --bg-dark: #050505;
+            --bg-elevated: #111111;
+            --bg-card: rgba(255,255,255,0.02);
+            --border: rgba(255,255,255,0.08);
+            --border-light: rgba(255,255,255,0.12);
+            --text: #ffffff;
+            --text-dim: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.25);
+            --red: #ff3b3b;
+            --green: #00ff88;
+        }
+
+        html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        @media (min-width: 1025px) {
+            body { cursor: none; }
+        }
+
+        ::selection { background: var(--gold); color: var(--bg); }
+        img, video { max-width: 100%; height: auto; display: block; }
+        a { color: inherit; text-decoration: none; }
+
+        /* ══════════════════════════════════════════════════════════════
+           CUSTOM CURSOR
+        ══════════════════════════════════════════════════════════════ */
+        .cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 10001;
+            mix-blend-mode: difference;
+            display: none;
+        }
+
+        @media (min-width: 1025px) {
+            .cursor { display: block; }
+        }
+
+        .cursor__dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.15s ease;
+        }
+
+        .cursor__ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s ease;
+            opacity: 0.5;
+        }
+
+        .cursor.hover .cursor__ring { transform: translate(-50%, -50%) scale(1.5); }
+        .cursor.hover .cursor__dot { transform: translate(-50%, -50%) scale(0.5); }
+
+        /* ══════════════════════════════════════════════════════════════
+           GRAIN OVERLAY
+        ══════════════════════════════════════════════════════════════ */
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9000;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           PRELOADER
+        ══════════════════════════════════════════════════════════════ */
+        .preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .preloader__content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .preloader__logo {
+            width: 80px;
+            height: 80px;
+            opacity: 0;
+            filter: drop-shadow(0 0 30px var(--gold-glow));
+        }
+
+        .preloader__text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.5em;
+            color: var(--gold);
+            opacity: 0;
+        }
+
+        .preloader__bar-wrap {
+            width: 200px;
+            height: 1px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .preloader__bar {
+            height: 100%;
+            width: 0;
+            background: var(--gold);
+        }
+
+        .preloader__percent {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            color: var(--gold);
+            opacity: 0;
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           NAVIGATION
+        ══════════════════════════════════════════════════════════════ */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 24px 40px;
+            transition: all 0.4s ease;
+        }
+
+        @media (max-width: 768px) { .nav { padding: 20px 20px; } }
+
+        .nav.scrolled {
+            padding: 16px 40px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) { .nav.scrolled { padding: 16px 20px; } }
+
+        .nav__inner {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav__logo { display: flex; align-items: center; gap: 12px; }
+        .nav__logo-img { width: 36px; height: 36px; }
+        .nav__logo-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.125rem;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+        }
+
+        @media (max-width: 600px) { .nav__logo-text { display: none; } }
+
+        .nav__links { display: flex; gap: 48px; }
+        @media (max-width: 1024px) { .nav__links { display: none; } }
+
+        .nav__link {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            transition: color 0.3s ease;
+        }
+
+        .nav__link:hover { color: var(--gold); }
+
+        .nav__cta {
+            padding: 12px 28px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.625rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav__cta:hover { background: var(--gold); color: var(--bg); }
+        @media (max-width: 768px) { .nav__cta { display: none; } }
+
+        .menu-toggle {
+            display: none;
+            width: 32px;
+            height: 24px;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) { .menu-toggle { display: flex; } }
+
+        .menu-toggle span {
+            display: block;
+            width: 100%;
+            height: 1px;
+            background: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
+            z-index: 99;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .mobile-menu.active { opacity: 1; visibility: visible; }
+
+        .mobile-menu__link {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            color: var(--text-dim);
+            transition: color 0.3s ease;
+        }
+
+        .mobile-menu__link:hover { color: var(--gold); }
+
+        /* ══════════════════════════════════════════════════════════════
+           HERO
+        ══════════════════════════════════════════════════════════════ */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero__video-wrap {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero__video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(0.3) contrast(1.2) brightness(0.35);
+        }
+
+        .hero__overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% 50%, transparent 0%, var(--bg) 70%),
+                linear-gradient(180deg, rgba(10,10,10,0.3) 0%, var(--bg) 100%);
+        }
+
+        /* Tactical Corners */
+        .hero__corners {
+            position: absolute;
+            inset: 30px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) { .hero__corners { inset: 16px; } }
+
+        .corner {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+        }
+
+        @media (max-width: 768px) { .corner { width: 30px; height: 30px; } }
+
+        .corner--tl { top: 0; left: 0; border-top: 1px solid var(--gold-dim); border-left: 1px solid var(--gold-dim); }
+        .corner--tr { top: 0; right: 0; border-top: 1px solid var(--gold-dim); border-right: 1px solid var(--gold-dim); }
+        .corner--bl { bottom: 0; left: 0; border-bottom: 1px solid var(--gold-dim); border-left: 1px solid var(--gold-dim); }
+        .corner--br { bottom: 0; right: 0; border-bottom: 1px solid var(--gold-dim); border-right: 1px solid var(--gold-dim); }
+
+        /* HUD */
+        .hud {
+            position: absolute;
+            z-index: 3;
+            font-size: 0.5625rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+        }
+
+        .hud--left { bottom: 50px; left: 50px; }
+        .hud--right { bottom: 50px; right: 50px; text-align: right; }
+        .hud .green { color: var(--green); }
+
+        @media (max-width: 768px) {
+            .hud--left { bottom: 30px; left: 20px; }
+            .hud--right { bottom: 30px; right: 20px; }
+        }
+
+        /* Hero Content */
+        .hero__content {
+            position: relative;
+            z-index: 4;
+            text-align: center;
+            padding: 0 24px;
+            max-width: 1400px;
+        }
+
+        .hero__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid var(--gold-dim);
+            font-size: 0.5625rem;
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 40px;
+        }
+
+        .hero__badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero__title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3.5rem, 16vw, 12rem);
+            line-height: 0.85;
+            letter-spacing: -0.02em;
+            margin-bottom: 32px;
+        }
+
+        .hero__title-line {
+            display: block;
+            overflow: hidden;
+            padding-bottom: 0.05em;
+        }
+
+        .hero__title-word {
+            display: inline-block;
+        }
+
+        .hero__title .outline {
+            -webkit-text-stroke: 2px var(--text);
+            color: transparent;
+        }
+
+        @media (max-width: 768px) {
+            .hero__title .outline { -webkit-text-stroke: 1px var(--text); }
+        }
+
+        .hero__title .gold {
+            color: var(--gold);
+            text-shadow: 0 0 80px var(--gold-glow);
+        }
+
+        .hero__subtitle {
+            font-size: clamp(0.875rem, 2vw, 1.125rem);
+            color: var(--text-dim);
+            max-width: 580px;
+            margin: 0 auto 48px;
+            line-height: 1.8;
+        }
+
+        .hero__ctas {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 18px 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn--primary { background: var(--gold); color: var(--bg); }
+        .btn--primary:hover {
+            background: var(--gold-light);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn--ghost {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn--ghost:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--gold-dim);
+            color: var(--gold);
+        }
+
+        .hero__scroll {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 4;
+        }
+
+        .hero__scroll-text {
+            font-size: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .hero__scroll-line {
+            width: 1px;
+            height: 50px;
+            background: linear-gradient(to bottom, var(--gold), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { transform: scaleY(0); transform-origin: top; }
+            50% { transform: scaleY(1); transform-origin: top; }
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           SECTIONS
+        ══════════════════════════════════════════════════════════════ */
+        .section {
+            position: relative;
+            padding: 140px 0;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) { .section { padding: 100px 0; } }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        @media (max-width: 768px) { .container { padding: 0 24px; } }
+
+        .section__header { margin-bottom: 64px; }
+        .section__header--center { text-align: center; }
+
+        .section__label {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.625rem;
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .section__label::before {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--gold);
+        }
+
+        .section__header--center .section__label::before { display: none; }
+
+        .section__title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.25rem, 5vw, 4rem);
+            line-height: 1;
+        }
+
+        .section__title .gold { color: var(--gold); }
+
+        /* ══════════════════════════════════════════════════════════════
+           PROBLEM SECTION
+        ══════════════════════════════════════════════════════════════ */
+        .problem {
+            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-dark) 50%, var(--bg) 100%);
+        }
+
+        .problem__grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 1200px) { .problem__grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .problem__grid { grid-template-columns: 1fr; } }
+
+        .problem__card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 36px 28px;
+            transition: all 0.4s ease;
+        }
+
+        .problem__card:hover {
+            border-color: var(--gold-dim);
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .problem__card-num {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            color: var(--border);
+            line-height: 1;
+        }
+
+        .problem__card-icon {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid var(--gold-dim);
+            margin-bottom: 24px;
+            color: var(--gold);
+        }
+
+        .problem__card h3 {
+            font-size: 1.0625rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .problem__card p {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           HORIZONTAL SCROLL
+        ══════════════════════════════════════════════════════════════ */
+        .horizontal { position: relative; background: var(--bg); }
+
+        .horizontal__wrapper {
+            display: flex;
+            flex-wrap: nowrap;
+            will-change: transform;
+        }
+
+        .h-panel {
+            flex-shrink: 0;
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 80px 60px;
+        }
+
+        @media (max-width: 768px) { .h-panel { padding: 60px 24px; } }
+
+        /* Tech Panel */
+        .panel-tech {
+            justify-content: center;
+            background: var(--bg);
+        }
+
+        .panel-tech::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 50% 50% at 30% 50%, rgba(212, 175, 55, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .tech__grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 80px;
+            align-items: center;
+            max-width: 1300px;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .tech__grid { grid-template-columns: 1fr; gap: 50px; text-align: center; }
+        }
+
+        .tech__visual {
+            position: relative;
+            aspect-ratio: 1;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .tech__video-wrap {
+            position: absolute;
+            inset: 18%;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1px solid var(--gold-dim);
+            box-shadow: 0 0 80px var(--gold-glow);
+        }
+
+        .tech__video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(0.7) contrast(1.1);
+        }
+
+        .tech__ring {
+            position: absolute;
+            border: 1px solid var(--gold-dim);
+            border-radius: 50%;
+        }
+
+        .tech__ring--1 { inset: 0; animation: spin 35s linear infinite; }
+        .tech__ring--2 { inset: 10%; animation: spin 28s linear infinite reverse; border-style: dashed; opacity: 0.3; }
+        .tech__ring--3 { inset: -6%; animation: spin 45s linear infinite; border-color: var(--border); }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .tech__ring-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .tech__ring--1 .tech__ring-dot { top: 0; left: 50%; transform: translate(-50%, -50%); }
+        .tech__ring--3 .tech__ring-dot { bottom: 15%; right: 0; transform: translateX(50%); }
+
+        .tech__label {
+            font-size: 0.625rem;
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+
+        .tech__title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+            line-height: 1;
+            margin-bottom: 40px;
+        }
+
+        .tech__features { display: flex; flex-direction: column; gap: 32px; }
+
+        .tech__feature { display: flex; gap: 20px; align-items: flex-start; }
+
+        @media (max-width: 1024px) {
+            .tech__feature { flex-direction: column; align-items: center; text-align: center; }
+        }
+
+        .tech__feature-icon {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+            color: var(--gold);
+        }
+
+        .tech__feature h4 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+        .tech__feature p { font-size: 0.8125rem; color: var(--text-dim); line-height: 1.6; max-width: 320px; }
+
+        @media (max-width: 1024px) { .tech__feature p { max-width: 100%; } }
+
+        /* Gallery Panel */
+        .panel-gallery {
+            width: 220vw;
+            background: var(--bg-elevated);
+            padding-top: 120px;
+        }
+
+        @media (max-width: 768px) { .panel-gallery { width: 380vw; padding-top: 100px; } }
+
+        .gallery__header {
+            position: absolute;
+            top: 70px;
+            left: 70px;
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) { .gallery__header { top: 30px; left: 24px; } }
+
+        .gallery__header .section__title { font-size: clamp(1.75rem, 3.5vw, 2.5rem); }
+
+        .gallery__track {
+            display: flex;
+            gap: 36px;
+            align-items: center;
+            height: 100%;
+            padding: 0 80px;
+        }
+
+        @media (max-width: 768px) { .gallery__track { gap: 20px; padding: 0 24px; } }
+
+        .gallery__item {
+            flex-shrink: 0;
+            width: clamp(280px, 30vw, 420px);
+            aspect-ratio: 3/4;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: border-color 0.4s ease;
+        }
+
+        .gallery__item:hover { border-color: var(--gold-dim); }
+
+        .gallery__item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .gallery__item:hover img { transform: scale(1.08); }
+
+        .gallery__overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .gallery__tag {
+            display: inline-block;
+            width: fit-content;
+            padding: 5px 12px;
+            background: var(--gold);
+            color: var(--bg);
+            font-size: 0.5rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .gallery__title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .gallery__desc { font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; }
+
+        /* ══════════════════════════════════════════════════════════════
+           DEMO SECTION
+        ══════════════════════════════════════════════════════════════ */
+        .demo {
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .demo__grid {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        @media (max-width: 1024px) {
+            .demo__grid { grid-template-columns: 1fr; gap: 50px; }
+        }
+
+        .demo__content { max-width: 500px; }
+
+        @media (max-width: 1024px) {
+            .demo__content { max-width: 100%; text-align: center; }
+        }
+
+        .demo__text {
+            color: var(--text-dim);
+            margin: 20px 0 32px;
+            line-height: 1.8;
+        }
+
+        .demo__video-wrap {
+            position: relative;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            border: 1px solid var(--gold-dim);
+        }
+
+        .demo__video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(0.8) contrast(1.05);
+        }
+
+        .demo__video-label {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: rgba(0,0,0,0.7);
+            padding: 8px 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo__video-label .rec {
+            width: 6px;
+            height: 6px;
+            background: var(--red);
+            border-radius: 50%;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* ══════════════════════════════════════════════════════════════
+           STATEMENT SECTION
+        ══════════════════════════════════════════════════════════════ */
+        .statement {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: var(--bg-dark);
+            overflow: hidden;
+            padding: 120px 24px;
+        }
+
+        .statement__bg {
+            position: absolute;
+            inset: -20%;
+            background: radial-gradient(ellipse 70% 50% at 50% 50%, var(--gold-glow) 0%, transparent 50%);
+            opacity: 0.5;
+        }
+
+        .statement__images {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .statement__img {
+            position: absolute;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            z-index: 0;
+        }
+
+        .statement__img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(0.5) contrast(1.1);
+        }
+
+        .statement__img--1 { width: 240px; height: 160px; top: 10%; left: 5%; }
+        .statement__img--2 { width: 280px; height: 180px; top: 15%; right: 6%; }
+        .statement__img--3 { width: 220px; height: 150px; bottom: 20%; left: 8%; }
+        .statement__img--4 { width: 200px; height: 140px; bottom: 15%; right: 10%; }
+
+        @media (max-width: 1200px) { .statement__img { display: none; } }
+
+        .statement__content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 1000px;
+        }
+
+        .statement__title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.75rem, 9vw, 7rem);
+            line-height: 0.95;
+            margin-bottom: 28px;
+        }
+
+        .statement__title .gold {
+            color: var(--gold);
+            text-shadow: 0 0 50px var(--gold-glow);
+        }
+
+        .statement__desc {
+            font-size: clamp(0.9375rem, 2vw, 1.0625rem);
+            color: var(--text-dim);
+            line-height: 1.8;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           PLATFORMS MARQUEE
+        ══════════════════════════════════════════════════════════════ */
+        .platforms {
+            padding: 80px 0;
+            background: var(--bg);
+            overflow: hidden;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .platforms__header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 0 24px;
+        }
+
+        .marquee { display: flex; gap: 20px; animation: marquee 35s linear infinite; }
+        .marquee:hover { animation-play-state: paused; }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .marquee__group { display: flex; gap: 20px; flex-shrink: 0; }
+
+        .platform {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .platform:hover {
+            border-color: var(--gold-dim);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .platform__icon { color: var(--gold); }
+        .platform__name { font-size: 0.875rem; font-weight: 600; }
+
+        /* ══════════════════════════════════════════════════════════════
+           STATS
+        ══════════════════════════════════════════════════════════════ */
+        .stats {
+            background: var(--bg-elevated);
+            padding: 120px 0;
+        }
+
+        .stats__grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 28px;
+        }
+
+        @media (max-width: 1024px) { .stats__grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .stats__grid { grid-template-columns: 1fr; } }
+
+        .stats__item {
+            text-align: center;
+            padding: 44px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .stats__item:hover { border-color: var(--gold-dim); }
+
+        .stats__value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.75rem, 5vw, 4rem);
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .stats__label { font-size: 0.8125rem; color: var(--text-dim); }
+
+        /* ══════════════════════════════════════════════════════════════
+           CTA
+        ══════════════════════════════════════════════════════════════ */
+        .cta {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 120px 24px;
+        }
+
+        .cta__bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 100% 70% at 50% 100%, rgba(212, 175, 55, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 30% at 80% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+        }
+
+        .cta__grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
+            background-size: 70px 70px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 80%, black, transparent);
+        }
+
+        .cta__content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 850px;
+        }
+
+        .cta__label {
+            font-size: 0.625rem;
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 24px;
+        }
+
+        .cta__title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.75rem, 8vw, 5.5rem);
+            line-height: 0.95;
+            margin-bottom: 24px;
+        }
+
+        .cta__title .gold { color: var(--gold); }
+
+        .cta__desc {
+            font-size: 1rem;
+            color: var(--text-dim);
+            line-height: 1.8;
+            margin-bottom: 44px;
+            max-width: 580px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta__buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+
+        /* ══════════════════════════════════════════════════════════════
+           FOOTER
+        ══════════════════════════════════════════════════════════════ */
+        .footer {
+            padding: 50px 40px;
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) { .footer { padding: 40px 24px; } }
+
+        .footer__inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+
+        @media (max-width: 768px) {
+            .footer__inner { flex-direction: column; text-align: center; }
+        }
+
+        .footer__logo { display: flex; align-items: center; gap: 12px; }
+        .footer__logo img { width: 28px; height: 28px; }
+        .footer__logo span {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.9375rem;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+        }
+
+        .footer__links { display: flex; gap: 36px; }
+        @media (max-width: 768px) { .footer__links { gap: 24px; flex-wrap: wrap; justify-content: center; } }
+
+        .footer__link {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            transition: color 0.3s ease;
+        }
+
+        .footer__link:hover { color: var(--gold); }
+        .footer__copy { font-size: 0.6875rem; color: var(--text-muted); }
+
+        /* ══════════════════════════════════════════════════════════════
+           VIDEO MODAL
+        ══════════════════════════════════════════════════════════════ */
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10003;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .modal.active { opacity: 1; visibility: visible; }
+
+        .modal__backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+        }
+
+        .modal__content {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            aspect-ratio: 16/9;
+            transform: scale(0.9);
+            transition: transform 0.4s ease;
+        }
+
+        .modal.active .modal__content { transform: scale(1); }
+
+        .modal__close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal__close:hover { background: var(--gold); color: var(--bg); }
+
+        .modal__video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor">
+        <div class="cursor__dot"></div>
+        <div class="cursor__ring"></div>
+    </div>
+
+    <div class="grain"></div>
+
+    <div class="preloader">
+        <div class="preloader__content">
+            <img src="MajesticLogo.webp" alt="" class="preloader__logo">
+            <div class="preloader__text">Initializing</div>
+            <div class="preloader__bar-wrap">
+                <div class="preloader__bar"></div>
+            </div>
+            <div class="preloader__percent">0%</div>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <div class="nav__inner">
+            <a href="#" class="nav__logo">
+                <img src="MajesticLogo.webp" alt="Majestic Level" class="nav__logo-img">
+                <span class="nav__logo-text">MAJESTIC LEVEL</span>
+            </a>
+            <div class="nav__links">
+                <a href="#about" class="nav__link">About</a>
+                <a href="#technology" class="nav__link">Technology</a>
+                <a href="#products" class="nav__link">Products</a>
+                <a href="#demo" class="nav__link">Demo</a>
+                <a href="#contact" class="nav__link">Contact</a>
+            </div>
+            <button class="nav__cta">Request Demo</button>
+            <button class="menu-toggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-menu">
+        <a href="#about" class="mobile-menu__link">About</a>
+        <a href="#technology" class="mobile-menu__link">Technology</a>
+        <a href="#products" class="mobile-menu__link">Products</a>
+        <a href="#demo" class="mobile-menu__link">Demo</a>
+        <a href="#contact" class="mobile-menu__link">Contact</a>
+    </div>
+
+    <main>
+        <section class="hero">
+            <div class="hero__video-wrap">
+                <video class="hero__video" autoplay muted loop playsinline>
+                    <source src="gunrotation.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="hero__overlay"></div>
+
+            <div class="hero__corners">
+                <div class="corner corner--tl"></div>
+                <div class="corner corner--tr"></div>
+                <div class="corner corner--bl"></div>
+                <div class="corner corner--br"></div>
+            </div>
+
+            <div class="hud hud--left">
+                <div>47.6062° N, 122.3321° W</div>
+                <div style="margin-top: 4px; opacity: 0.6;">SYS.ONLINE</div>
+            </div>
+            <div class="hud hud--right">
+                <div>STATUS: <span class="green">ACTIVE</span></div>
+                <div style="margin-top: 4px; opacity: 0.6;">VER 2.4.1</div>
+            </div>
+
+            <div class="hero__content">
+                <div class="hero__badge">
+                    <span class="hero__badge-dot"></span>
+                    Next-Gen Training Systems
+                </div>
+                <h1 class="hero__title">
+                    <span class="hero__title-line"><span class="hero__title-word outline">REDEFINE</span></span>
+                    <span class="hero__title-line"><span class="hero__title-word gold">TACTICAL</span></span>
+                    <span class="hero__title-line"><span class="hero__title-word">TRAINING</span></span>
+                </h1>
+                <p class="hero__subtitle">Where virtual reality meets precision engineering. Eliminate negative training habits with AI-powered systems that establish new quantifiable standards.</p>
+                <div class="hero__ctas">
+                    <button class="btn btn--primary">Request Demo</button>
+                    <button class="btn btn--ghost" id="openModal">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Watch Demo
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero__scroll">
+                <span class="hero__scroll-text">Scroll</span>
+                <div class="hero__scroll-line"></div>
+            </div>
+        </section>
+
+        <section class="section problem" id="about">
+            <div class="container">
+                <header class="section__header section__header--center">
+                    <span class="section__label">The Challenge</span>
+                    <h2 class="section__title">Traditional Training <span class="gold">Falls Short</span></h2>
+                </header>
+                <div class="problem__grid">
+                    <article class="problem__card">
+                        <span class="problem__card-num">01</span>
+                        <div class="problem__card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                        </div>
+                        <h3>Negative Habits</h3>
+                        <p>Repetitive training without realistic feedback reinforces dangerous habits that surface under stress.</p>
+                    </article>
+                    <article class="problem__card">
+                        <span class="problem__card-num">02</span>
+                        <div class="problem__card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                        </div>
+                        <h3>High Costs</h3>
+                        <p>Quality training systems demand significant investment, limiting access for organizations.</p>
+                    </article>
+                    <article class="problem__card">
+                        <span class="problem__card-num">03</span>
+                        <div class="problem__card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <h3>No Metrics</h3>
+                        <p>Subjective assessments make tracking real improvement and identifying weaknesses impossible.</p>
+                    </article>
+                    <article class="problem__card">
+                        <span class="problem__card-num">04</span>
+                        <div class="problem__card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+                        </div>
+                        <h3>Platform Lock-in</h3>
+                        <p>Proprietary systems force expensive equipment repurchases when upgrading technology.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="horizontal" id="technology">
+            <div class="horizontal__wrapper">
+                <div class="h-panel panel-tech">
+                    <div class="tech__grid">
+                        <div class="tech__visual">
+                            <div class="tech__ring tech__ring--3"><span class="tech__ring-dot"></span></div>
+                            <div class="tech__ring tech__ring--1"><span class="tech__ring-dot"></span></div>
+                            <div class="tech__ring tech__ring--2"></div>
+                            <div class="tech__video-wrap">
+                                <video class="tech__video" autoplay muted loop playsinline>
+                                    <source src="ShortenM4_compressed.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                        </div>
+                        <div class="tech__info">
+                            <span class="tech__label">Our Technology</span>
+                            <h2 class="tech__title">Three Pillars of <span class="gold">Excellence</span></h2>
+                            <div class="tech__features">
+                                <div class="tech__feature">
+                                    <div class="tech__feature-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                                    </div>
+                                    <div>
+                                        <h4>Virtual Reality</h4>
+                                        <p>Immersive scenarios across Meta Quest, HTC Vive, and Varjo platforms with full haptic integration.</p>
+                                    </div>
+                                </div>
+                                <div class="tech__feature">
+                                    <div class="tech__feature-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                    </div>
+                                    <div>
+                                        <h4>3D Printed Replicas</h4>
+                                        <p>Custom firearm replicas with authentic weight distribution, balance, and simulated recoil.</p>
+                                    </div>
+                                </div>
+                                <div class="tech__feature">
+                                    <div class="tech__feature-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 12l4-4"/><circle cx="12" cy="12" r="2"/></svg>
+                                    </div>
+                                    <div>
+                                        <h4>AI Analytics</h4>
+                                        <p>Real-time performance tracking with machine learning recommendations for improvement.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-panel panel-gallery" id="products">
+                    <header class="gallery__header">
+                        <span class="section__label">Products</span>
+                        <h2 class="section__title">Training <span class="gold">Arsenal</span></h2>
+                    </header>
+                    <div class="gallery__track">
+                        <article class="gallery__item">
+                            <img src="firefox_uN7lpWwT9v.webp" alt="VR Training System" loading="lazy">
+                            <div class="gallery__overlay">
+                                <span class="gallery__tag">Featured</span>
+                                <h3 class="gallery__title">VR Combat Simulator</h3>
+                                <p class="gallery__desc">Full immersion with haptic feedback and AI coaching.</p>
+                            </div>
+                        </article>
+                        <article class="gallery__item">
+                            <img src="IMG_1043.webp" alt="Compact Trainer" loading="lazy">
+                            <div class="gallery__overlay">
+                                <span class="gallery__tag">Replica</span>
+                                <h3 class="gallery__title">Compact Trainer</h3>
+                                <p class="gallery__desc">Precision weighted with authentic trigger pull.</p>
+                            </div>
+                        </article>
+                        <article class="gallery__item">
+                            <img src="IMG_1080.webp" alt="Team Training Kit" loading="lazy">
+                            <div class="gallery__overlay">
+                                <span class="gallery__tag">Fleet</span>
+                                <h3 class="gallery__title">Team Training Kit</h3>
+                                <p class="gallery__desc">Color-coded for group training scenarios.</p>
+                            </div>
+                        </article>
+                        <article class="gallery__item">
+                            <img src="vlc_6rv9tqmNIJ.webp" alt="Holster System" loading="lazy">
+                            <div class="gallery__overlay">
+                                <span class="gallery__tag">Draw System</span>
+                                <h3 class="gallery__title">Holster Compatible</h3>
+                                <p class="gallery__desc">Works with standard duty holsters.</p>
+                            </div>
+                        </article>
+                        <article class="gallery__item">
+                            <img src="Assembly_New.webp" alt="Custom Build" loading="lazy">
+                            <div class="gallery__overlay">
+                                <span class="gallery__tag">Custom</span>
+                                <h3 class="gallery__title">Custom Builds</h3>
+                                <p class="gallery__desc">Tailored to your exact specifications.</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section demo" id="demo">
+            <div class="container">
+                <div class="demo__grid">
+                    <div class="demo__content">
+                        <span class="section__label">See It In Action</span>
+                        <h2 class="section__title">Real Training.<br><span class="gold">Real Results.</span></h2>
+                        <p class="demo__text">Watch our team demonstrate the full capabilities of our VR training system integrated with Tesla suit haptic feedback.</p>
+                        <button class="btn btn--primary" id="openModal2">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Watch Full Demo
+                        </button>
+                    </div>
+                    <div class="demo__video-wrap">
+                        <div class="demo__video-label">
+                            <span class="rec"></span>
+                            Live Demo
+                        </div>
+                        <video class="demo__video" autoplay muted loop playsinline>
+                            <source src="TeslaTAZE_compressed.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="statement">
+            <div class="statement__bg"></div>
+            <div class="statement__images">
+                <div class="statement__img statement__img--1" data-speed="0.3">
+                    <img src="Stippled_Frame_Rail_Edit.webp" alt="" loading="lazy">
+                </div>
+                <div class="statement__img statement__img--2" data-speed="0.5">
+                    <img src="Assembly_New.webp" alt="" loading="lazy">
+                </div>
+                <div class="statement__img statement__img--3" data-speed="0.2">
+                    <img src="IMG_1043.webp" alt="" loading="lazy">
+                </div>
+                <div class="statement__img statement__img--4" data-speed="0.4">
+                    <img src="IMG_1080.webp" alt="" loading="lazy">
+                </div>
+            </div>
+            <div class="statement__content">
+                <h2 class="statement__title">YOUR PLATFORM.<br><span class="gold">YOUR TRAINING.</span><br>NEW STANDARDS.</h2>
+                <p class="statement__desc">From Meta Quest to Varjo XR-4, from existing IR systems to custom integrations—our technology adapts to your infrastructure.</p>
+            </div>
+        </section>
+
+        <section class="platforms">
+            <div class="platforms__header">
+                <span class="section__label">Compatible Platforms</span>
+                <h2 class="section__title" style="font-size: clamp(1.75rem, 4vw, 2.5rem);">Seamless <span class="gold">Integration</span></h2>
+            </div>
+            <div class="marquee">
+                <div class="marquee__group">
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Meta Quest 2 & 3</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">HTC Vive Pro</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Varjo XR-4</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Teslasuit Haptics</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Existing IR Systems</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Custom Integrations</span></div>
+                </div>
+                <div class="marquee__group">
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Meta Quest 2 & 3</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">HTC Vive Pro</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Varjo XR-4</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Teslasuit Haptics</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Existing IR Systems</span></div>
+                    <div class="platform"><svg class="platform__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="platform__name">Custom Integrations</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="container">
+                <div class="stats__grid">
+                    <div class="stats__item"><div class="stats__value">40%</div><div class="stats__label">Faster Target Acquisition</div></div>
+                    <div class="stats__item"><div class="stats__value">3×</div><div class="stats__label">More Training Sessions</div></div>
+                    <div class="stats__item"><div class="stats__value">60%</div><div class="stats__label">Cost Reduction</div></div>
+                    <div class="stats__item"><div class="stats__value">100%</div><div class="stats__label">Safe Environment</div></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta" id="contact">
+            <div class="cta__bg"></div>
+            <div class="cta__grid"></div>
+            <div class="cta__content">
+                <span class="cta__label">Ready to Transform?</span>
+                <h2 class="cta__title">ELEVATE YOUR<br><span class="gold">TRAINING PROGRAM</span></h2>
+                <p class="cta__desc">Join military units, law enforcement agencies, and professional organizations already redefining their tactical training standards.</p>
+                <div class="cta__buttons">
+                    <button class="btn btn--primary">Request a Demo</button>
+                    <button class="btn btn--ghost">Contact Sales</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <a href="#" class="footer__logo">
+                <img src="MajesticLogo.webp" alt="">
+                <span>MAJESTIC LEVEL</span>
+            </a>
+            <nav class="footer__links">
+                <a href="#" class="footer__link">Privacy</a>
+                <a href="#" class="footer__link">Terms</a>
+                <a href="#" class="footer__link">Contact</a>
+            </nav>
+            <p class="footer__copy">© 2025 Majestic Level. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="modal" id="demoModal">
+        <div class="modal__backdrop"></div>
+        <div class="modal__content">
+            <button class="modal__close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <video class="modal__video" controls>
+                <source src="TeslasuitxVRTrackedWeapons.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+    <script>
+    (function() {
+        'use strict';
+        gsap.registerPlugin(ScrollTrigger);
+
+        // ═══════════════════════════════════════════════════════════
+        // CURSOR
+        // ═══════════════════════════════════════════════════════════
+        const cursor = document.querySelector('.cursor');
+        if (cursor && window.innerWidth > 1024) {
+            let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+
+            document.addEventListener('mousemove', e => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            (function loop() {
+                cursorX += (mouseX - cursorX) * 0.15;
+                cursorY += (mouseY - cursorY) * 0.15;
+                cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+                requestAnimationFrame(loop);
+            })();
+
+            document.querySelectorAll('a, button, .gallery__item, .problem__card').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // PRELOADER
+        // ═══════════════════════════════════════════════════════════
+        const preloader = document.querySelector('.preloader');
+        const preloaderBar = document.querySelector('.preloader__bar');
+        const preloaderPercent = document.querySelector('.preloader__percent');
+        const preloaderLogo = document.querySelector('.preloader__logo');
+        const preloaderText = document.querySelector('.preloader__text');
+
+        gsap.timeline({ onComplete: initSite })
+            .to(preloaderLogo, { opacity: 1, duration: 0.4 })
+            .to(preloaderText, { opacity: 1, duration: 0.3 }, 0.2)
+            .to(preloaderPercent, { opacity: 1, duration: 0.3 }, 0.3)
+            .to(preloaderBar, {
+                width: '100%',
+                duration: 1.8,
+                ease: 'power2.inOut',
+                onUpdate: function() {
+                    preloaderPercent.textContent = Math.round(this.progress() * 100) + '%';
+                }
+            }, 0.4)
+            .to(preloader, {
+                yPercent: -100,
+                duration: 0.7,
+                ease: 'power3.inOut',
+                delay: 0.2
+            });
+
+        // ═══════════════════════════════════════════════════════════
+        // MAIN INIT
+        // ═══════════════════════════════════════════════════════════
+        function initSite() {
+            // Lenis
+            const lenis = new Lenis({ duration: 1.2, smoothWheel: true });
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add(t => lenis.raf(t * 1000));
+            gsap.ticker.lagSmoothing(0);
+
+            // Nav scroll
+            window.addEventListener('scroll', () => {
+                document.querySelector('.nav').classList.toggle('scrolled', window.scrollY > 80);
+            }, { passive: true });
+
+            // Mobile menu
+            const toggle = document.querySelector('.menu-toggle');
+            const mobileMenu = document.querySelector('.mobile-menu');
+
+            toggle.addEventListener('click', () => {
+                toggle.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+                mobileMenu.classList.contains('active') ? lenis.stop() : lenis.start();
+            });
+
+            document.querySelectorAll('.mobile-menu__link').forEach(link => {
+                link.addEventListener('click', () => {
+                    toggle.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                    lenis.start();
+                });
+            });
+
+            // Smooth anchors
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', e => {
+                    e.preventDefault();
+                    const target = document.querySelector(anchor.getAttribute('href'));
+                    if (target) lenis.scrollTo(target, { offset: -80 });
+                });
+            });
+
+            // ═══════════════════════════════════════════════════════════
+            // HERO ANIMATIONS
+            // ═══════════════════════════════════════════════════════════
+            gsap.from('.hero__badge', { opacity: 0, y: 30, duration: 0.8, delay: 0.1 });
+            gsap.from('.hero__title-word', { y: '100%', duration: 1, stagger: 0.1, ease: 'power4.out', delay: 0.2 });
+            gsap.from('.hero__subtitle', { opacity: 0, y: 30, duration: 0.8, delay: 0.6 });
+            gsap.from('.hero__ctas', { opacity: 0, y: 30, duration: 0.8, delay: 0.7 });
+            gsap.from('.hero__scroll', { opacity: 0, duration: 0.6, delay: 1 });
+            gsap.from('.corner', { opacity: 0, duration: 0.5, stagger: 0.1, delay: 0.8 });
+
+            // ═══════════════════════════════════════════════════════════
+            // PROBLEM SECTION
+            // ═══════════════════════════════════════════════════════════
+            gsap.from('.problem .section__label, .problem .section__title', {
+                scrollTrigger: { trigger: '.problem', start: 'top 80%' },
+                opacity: 0, y: 30, duration: 0.7, stagger: 0.1
+            });
+
+            gsap.from('.problem__card', {
+                scrollTrigger: { trigger: '.problem__grid', start: 'top 80%' },
+                opacity: 0, y: 50, duration: 0.7, stagger: 0.1
+            });
+
+            // ═══════════════════════════════════════════════════════════
+            // HORIZONTAL SCROLL
+            // ═══════════════════════════════════════════════════════════
+            const hSection = document.querySelector('.horizontal');
+            const hWrapper = document.querySelector('.horizontal__wrapper');
+            const panels = gsap.utils.toArray('.h-panel');
+
+            let totalW = 0;
+            panels.forEach(p => totalW += p.offsetWidth);
+            const scrollDist = totalW - window.innerWidth;
+
+            gsap.to(hWrapper, {
+                x: -scrollDist,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: hSection,
+                    pin: true,
+                    scrub: 1,
+                    end: '+=' + scrollDist,
+                    invalidateOnRefresh: true
+                }
+            });
+
+            // Tech panel reveal
+            gsap.from('.tech__visual', {
+                scrollTrigger: { trigger: hSection, start: 'top 60%' },
+                scale: 0.85, opacity: 0, rotation: -10, duration: 1
+            });
+
+            gsap.from('.tech__label, .tech__title, .tech__feature', {
+                scrollTrigger: { trigger: hSection, start: 'top 60%' },
+                opacity: 0, x: 50, duration: 0.7, stagger: 0.1
+            });
+
+            // Gallery items - simple reveal when horizontal section starts
+            gsap.from('.gallery__item', {
+                scrollTrigger: { trigger: hSection, start: 'top 40%' },
+                y: 60, opacity: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out'
+            });
+
+            // ═══════════════════════════════════════════════════════════
+            // DEMO SECTION
+            // ═══════════════════════════════════════════════════════════
+            gsap.from('.demo__content > *', {
+                scrollTrigger: { trigger: '.demo', start: 'top 70%' },
+                opacity: 0, y: 40, duration: 0.7, stagger: 0.1
+            });
+
+            gsap.from('.demo__video-wrap', {
+                scrollTrigger: { trigger: '.demo', start: 'top 70%' },
+                opacity: 0, scale: 0.95, duration: 0.8, delay: 0.2
+            });
+
+            // ═══════════════════════════════════════════════════════════
+            // STATEMENT PARALLAX
+            // ═══════════════════════════════════════════════════════════
+            gsap.to('.statement__bg', {
+                yPercent: 25,
+                ease: 'none',
+                scrollTrigger: { trigger: '.statement', start: 'top bottom', end: 'bottom top', scrub: true }
+            });
+
+            document.querySelectorAll('.statement__img').forEach(img => {
+                const speed = parseFloat(img.dataset.speed) || 0.3;
+                gsap.fromTo(img,
+                    { y: 80, opacity: 0 },
+                    {
+                        y: -100 * speed,
+                        opacity: 0.85,
+                        ease: 'none',
+                        scrollTrigger: { trigger: '.statement', start: 'top bottom', end: 'bottom top', scrub: true }
+                    }
+                );
+            });
+
+            gsap.from('.statement__title, .statement__desc', {
+                scrollTrigger: { trigger: '.statement', start: 'top 60%' },
+                opacity: 0, y: 50, duration: 0.8, stagger: 0.15
+            });
+
+            // ═══════════════════════════════════════════════════════════
+            // STATS
+            // ═══════════════════════════════════════════════════════════
+            gsap.from('.stats__item', {
+                scrollTrigger: { trigger: '.stats', start: 'top 75%' },
+                opacity: 0, y: 40, duration: 0.6, stagger: 0.1
+            });
+
+            // ═══════════════════════════════════════════════════════════
+            // CTA
+            // ═══════════════════════════════════════════════════════════
+            gsap.from('.cta__content > *', {
+                scrollTrigger: { trigger: '.cta', start: 'top 60%' },
+                opacity: 0, y: 40, duration: 0.7, stagger: 0.1
+            });
+
+            // ═══════════════════════════════════════════════════════════
+            // VIDEO MODAL
+            // ═══════════════════════════════════════════════════════════
+            const modal = document.getElementById('demoModal');
+            const modalVideo = modal.querySelector('.modal__video');
+            const modalClose = modal.querySelector('.modal__close');
+            const modalBackdrop = modal.querySelector('.modal__backdrop');
+
+            document.querySelectorAll('#openModal, #openModal2').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    modal.classList.add('active');
+                    lenis.stop();
+                    modalVideo.play();
+                });
+            });
+
+            function closeModal() {
+                modal.classList.remove('active');
+                lenis.start();
+                modalVideo.pause();
+                modalVideo.currentTime = 0;
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', closeModal);
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+            });
+
+            // Resize
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => ScrollTrigger.refresh(), 250);
+            });
+        }
+    })();
+    </script>
+</body>
+</html>
