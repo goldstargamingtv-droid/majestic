@@ -628,133 +628,160 @@
             filter: drop-shadow(0 0 5px rgba(0, 220, 255, 0.8));
         }
         
-        /* White tactical chevron arrows > < pointing at reticle */
-        .tactical__chevron {
+        /* ══════════════════════════════════════════════════════════════
+           WHITE TACTICAL HUD ELEMENTS - positioned around the gun area
+           Gun/reticle center is approx: right 25%, top 40%
+        ══════════════════════════════════════════════════════════════ */
+        
+        /* > chevron pointing RIGHT - sits to the LEFT of the reticle */
+        .tactical__chevron-right {
             position: absolute;
+            right: 52%;
+            top: 42%;
             font-family: 'Rajdhani', monospace;
             font-size: 28px;
             font-weight: 300;
             color: rgba(255, 255, 255, 0.25);
-            line-height: 1;
+            z-index: 2;
         }
-        .tactical__chevron--left {
-            right: calc(25% + 280px);
-            top: calc(15% + 50px + 180px);
-        }
-        .tactical__chevron--right {
-            right: calc(25% - 100px);
-            top: calc(15% + 50px + 200px);
-        }
-        .tactical__chevron--top {
-            right: calc(25% + 100px);
-            top: calc(15% + 50px - 60px);
-            transform: rotate(90deg);
-        }
-        .tactical__chevron--bottom {
-            right: calc(25% + 150px);
-            top: calc(15% + 50px + 450px);
-            transform: rotate(-90deg);
-        }
-        @media (max-width: 1200px) { .tactical__chevron { display: none; } }
         
-        /* White thin accent lines */
+        /* < chevron pointing LEFT - sits to the RIGHT of reticle, upper area */
+        .tactical__chevron-left {
+            position: absolute;
+            right: 8%;
+            top: 32%;
+            font-family: 'Rajdhani', monospace;
+            font-size: 24px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.2);
+            z-index: 2;
+        }
+        
+        /* ∨ chevrons pointing DOWN - below the gun grip */
+        .tactical__chevron-down {
+            position: absolute;
+            font-family: 'Rajdhani', monospace;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.2);
+            z-index: 2;
+        }
+        .tactical__chevron-down--1 {
+            right: 32%;
+            bottom: 20%;
+            font-size: 24px;
+        }
+        .tactical__chevron-down--2 {
+            right: 26%;
+            bottom: 16%;
+            font-size: 20px;
+        }
+        
+        /* White partial arc in top-right corner going off screen */
+        .tactical__arc {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .tactical__arc--1 {
+            width: 180px;
+            height: 180px;
+            right: -50px;
+            top: 8%;
+        }
+        .tactical__arc--2 {
+            width: 140px;
+            height: 140px;
+            right: -35px;
+            top: 12%;
+            border-width: 1px;
+            border-style: dashed;
+            opacity: 0.6;
+        }
+        
+        /* L-shaped corner lines */
+        .tactical__corner {
+            position: absolute;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .tactical__corner::before,
+        .tactical__corner::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        /* Horizontal part */
+        .tactical__corner::before {
+            width: 60px;
+            height: 2px;
+            top: 0;
+            left: 0;
+        }
+        /* Vertical part */
+        .tactical__corner::after {
+            width: 2px;
+            height: 40px;
+            top: 0;
+            left: 0;
+        }
+        .tactical__corner--1 {
+            right: 6%;
+            top: 18%;
+        }
+        .tactical__corner--2 {
+            right: 28%;
+            bottom: 12%;
+            transform: rotate(180deg);
+        }
+        
+        /* Small dots */
+        .tactical__dot {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            z-index: 2;
+        }
+        .tactical__dot--1 {
+            right: 4%;
+            bottom: 22%;
+        }
+        .tactical__dot--2 {
+            right: 40%;
+            bottom: 8%;
+        }
+        
+        /* Single accent lines */
         .tactical__line {
             position: absolute;
             background: rgba(255, 255, 255, 0.12);
             z-index: 2;
         }
         .tactical__line--1 {
-            width: 150px;
-            height: 1px;
-            right: calc(25% + 250px);
-            top: calc(15% + 50px + 100px);
-            transform: rotate(-25deg);
+            width: 50px;
+            height: 2px;
+            right: 12%;
+            bottom: 30%;
         }
         .tactical__line--2 {
-            width: 80px;
-            height: 1px;
-            right: calc(25% + 300px);
-            top: calc(15% + 50px + 250px);
-            transform: rotate(15deg);
+            width: 2px;
+            height: 35px;
+            right: 38%;
+            bottom: 5%;
         }
-        .tactical__line--3 {
-            width: 120px;
-            height: 1px;
-            right: calc(25% - 80px);
-            top: calc(15% + 50px + 150px);
-            transform: rotate(-10deg);
-        }
-        .tactical__line--4 {
-            width: 60px;
-            height: 1px;
-            right: calc(25% - 50px);
-            top: calc(15% + 50px + 320px);
-            transform: rotate(30deg);
-        }
-        .tactical__line--5 {
-            width: 1px;
-            height: 100px;
-            right: calc(25% - 120px);
-            top: calc(15% + 50px + 380px);
-        }
-        .tactical__line--6 {
-            width: 100px;
-            height: 1px;
-            right: calc(25% + 350px);
-            top: calc(15% + 50px + 380px);
-            transform: rotate(-5deg);
-        }
-        @media (max-width: 1200px) { .tactical__line { display: none; } }
         
-        /* Small tactical dots */
-        .tactical__dot {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            z-index: 2;
+        @media (max-width: 1200px) {
+            .tactical__chevron-right,
+            .tactical__chevron-left,
+            .tactical__chevron-down,
+            .tactical__arc,
+            .tactical__corner,
+            .tactical__dot,
+            .tactical__line { display: none; }
         }
-        .tactical__dot--1 {
-            right: calc(25% - 130px);
-            top: calc(15% + 50px + 420px);
-        }
-        .tactical__dot--2 {
-            right: calc(25% + 380px);
-            top: calc(15% + 50px + 80px);
-        }
-        .tactical__dot--3 {
-            right: calc(25% - 60px);
-            top: calc(15% + 50px + 50px);
-        }
-        @media (max-width: 1200px) { .tactical__dot { display: none; } }
-        
-        /* White outline chevrons (the > < style) */
-        .tactical__bracket {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-right: none;
-            border-top: none;
-            z-index: 2;
-        }
-        .tactical__bracket--1 {
-            right: calc(25% + 280px);
-            top: calc(15% + 50px + 150px);
-            transform: rotate(45deg);
-        }
-        .tactical__bracket--2 {
-            right: calc(25% - 70px);
-            top: calc(15% + 50px + 280px);
-            transform: rotate(-135deg);
-        }
-        .tactical__bracket--3 {
-            right: calc(25% + 180px);
-            top: calc(15% + 50px + 460px);
-            transform: rotate(135deg);
-        }
-        @media (max-width: 1200px) { .tactical__bracket { display: none; } }
 
         /* Tactical Corners */
         .hero__corners {
@@ -1733,23 +1760,19 @@
                 <div class="reticle__arrow reticle__arrow--w"></div>
             </div>
             
-            <!-- White tactical accents around reticle -->
-            <div class="tactical__chevron tactical__chevron--left">&gt;</div>
-            <div class="tactical__chevron tactical__chevron--right">&lt;</div>
-            <div class="tactical__chevron tactical__chevron--top">∨</div>
-            <div class="tactical__chevron tactical__chevron--bottom">∧</div>
-            <div class="tactical__line tactical__line--1"></div>
-            <div class="tactical__line tactical__line--2"></div>
-            <div class="tactical__line tactical__line--3"></div>
-            <div class="tactical__line tactical__line--4"></div>
-            <div class="tactical__line tactical__line--5"></div>
-            <div class="tactical__line tactical__line--6"></div>
+            <!-- White tactical HUD accents -->
+            <div class="tactical__chevron-right">&gt;</div>
+            <div class="tactical__chevron-left">&lt;</div>
+            <div class="tactical__chevron-down tactical__chevron-down--1">∨</div>
+            <div class="tactical__chevron-down tactical__chevron-down--2">∨</div>
+            <div class="tactical__arc tactical__arc--1"></div>
+            <div class="tactical__arc tactical__arc--2"></div>
+            <div class="tactical__corner tactical__corner--1"></div>
+            <div class="tactical__corner tactical__corner--2"></div>
             <div class="tactical__dot tactical__dot--1"></div>
             <div class="tactical__dot tactical__dot--2"></div>
-            <div class="tactical__dot tactical__dot--3"></div>
-            <div class="tactical__bracket tactical__bracket--1"></div>
-            <div class="tactical__bracket tactical__bracket--2"></div>
-            <div class="tactical__bracket tactical__bracket--3"></div>
+            <div class="tactical__line tactical__line--1"></div>
+            <div class="tactical__line tactical__line--2"></div>
             
             <div class="hero__overlay"></div>
 
