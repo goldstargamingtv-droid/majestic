@@ -272,7 +272,8 @@
         .hero__video {
             width: 100%; height: 100%;
             object-fit: cover;
-            filter: saturate(0.3) contrast(1.2) brightness(0.35);
+            /* FIX #2: Brighten the hero video */
+            filter: saturate(0.4) contrast(1.1) brightness(0.5);
         }
         .hero__overlay {
             position: absolute;
@@ -280,7 +281,7 @@
             z-index: 1;
             background: 
                 radial-gradient(ellipse 80% 50% at 50% 50%, transparent 0%, var(--bg) 70%),
-                linear-gradient(180deg, rgba(10,10,10,0.3) 0%, var(--bg) 100%);
+                linear-gradient(180deg, rgba(10,10,10,0.2) 0%, var(--bg) 100%);
         }
 
         /* Tactical Corners */
@@ -328,6 +329,8 @@
             text-align: center;
             padding: 0 24px;
             max-width: 1400px;
+            /* FIX #1: Push content down so badge doesn't overlap nav */
+            margin-top: 80px;
         }
         .hero__badge {
             display: inline-flex;
@@ -346,9 +349,9 @@
         .hero__badge-dot {
             width: 6px; height: 6px;
             background: var(--gold);
-            animation: pulse 2s ease-in-out infinite;
+            animation: anim-badge-pulse 3s ease-in-out infinite;
         }
-        @keyframes pulse {
+        @keyframes anim-badge-pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
         }
@@ -424,30 +427,35 @@
             color: var(--gold);
         }
 
+        /* FIX #4: Scroll indicator - better positioning and visibility */
         .hero__scroll {
             position: absolute;
-            bottom: 40px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
-            z-index: 4;
+            z-index: 5;
+        }
+        @media (max-width: 768px) {
+            .hero__scroll { bottom: 80px; }
         }
         .hero__scroll-text {
-            font-size: 0.5rem;
+            font-size: 0.625rem;
             font-weight: 600;
-            letter-spacing: 0.4em;
+            letter-spacing: 0.3em;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: var(--text-dim);
         }
         .hero__scroll-line {
-            width: 1px; height: 50px;
+            width: 1px; 
+            height: 60px;
             background: linear-gradient(to bottom, var(--gold), transparent);
-            animation: scrollPulse 2s ease-in-out infinite;
+            animation: anim-scroll-line 2.5s ease-in-out infinite;
         }
-        @keyframes scrollPulse {
+        @keyframes anim-scroll-line {
             0%, 100% { transform: scaleY(0); transform-origin: top; }
             50% { transform: scaleY(1); transform-origin: top; }
         }
@@ -596,10 +604,13 @@
         @media (max-width: 1024px) {
             .tech__grid { grid-template-columns: 1fr; gap: 50px; text-align: center; }
         }
+        
+        /* FIX #3: Tech visual - ensure it's visible */
         .tech__visual {
             position: relative;
             aspect-ratio: 1;
             max-width: 450px;
+            width: 100%;
             margin: 0 auto;
         }
         .tech__video-wrap {
@@ -609,21 +620,24 @@
             overflow: hidden;
             border: 1px solid var(--gold-dim);
             box-shadow: 0 0 80px var(--gold-glow);
+            z-index: 2;
         }
         .tech__video {
             width: 100%; height: 100%;
             object-fit: cover;
-            filter: saturate(0.7) contrast(1.1);
+            /* filter removed for performance */
         }
         .tech__ring {
             position: absolute;
             border: 1px solid var(--gold-dim);
             border-radius: 50%;
         }
-        .tech__ring--1 { inset: 0; animation: spin 35s linear infinite; }
-        .tech__ring--2 { inset: 10%; animation: spin 28s linear infinite reverse; border-style: dashed; opacity: 0.3; }
-        .tech__ring--3 { inset: -6%; animation: spin 45s linear infinite; border-color: var(--border); }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .tech__ring--1 { inset: 0; animation: anim-ring-1 30s linear infinite; }
+        .tech__ring--2 { inset: 10%; animation: anim-ring-2 25s linear infinite reverse; border-style: dashed; opacity: 0.3; }
+        .tech__ring--3 { inset: -6%; animation: anim-ring-3 40s linear infinite; border-color: var(--border); }
+        @keyframes anim-ring-1 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes anim-ring-2 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes anim-ring-3 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .tech__ring-dot {
             position: absolute;
@@ -632,8 +646,18 @@
             border-radius: 50%;
             box-shadow: 0 0 15px var(--gold-glow);
         }
-        .tech__ring--1 .tech__ring-dot { top: 0; left: 50%; transform: translate(-50%, -50%); }
-        .tech__ring--3 .tech__ring-dot { bottom: 15%; right: 0; transform: translateX(50%); }
+        .tech__ring--1 .dot-1 { top: 0; left: 50%; transform: translate(-50%, -50%); }
+        .tech__ring--1 .dot-2 { bottom: 0; left: 50%; transform: translate(-50%, 50%); }
+        .tech__ring--1 .dot-3 { top: 50%; left: 0; transform: translate(-50%, -50%); }
+        .tech__ring--1 .dot-4 { top: 50%; right: 0; transform: translate(50%, -50%); }
+        .tech__ring--2 .dot-1 { top: 0; left: 50%; transform: translate(-50%, -50%); }
+        .tech__ring--2 .dot-2 { top: 50%; right: 0; transform: translate(50%, -50%); }
+        .tech__ring--2 .dot-3 { bottom: 0; left: 50%; transform: translate(-50%, 50%); }
+        .tech__ring--2 .dot-4 { top: 50%; left: 0; transform: translate(-50%, -50%); }
+        .tech__ring--3 .dot-1 { top: 0; left: 50%; transform: translate(-50%, -50%); }
+        .tech__ring--3 .dot-2 { top: 50%; right: 0; transform: translate(50%, -50%); }
+        .tech__ring--3 .dot-3 { bottom: 0; left: 50%; transform: translate(-50%, 50%); }
+        .tech__ring--3 .dot-4 { top: 50%; left: 0; transform: translate(-50%, -50%); }
 
         .tech__label {
             font-size: 0.625rem;
@@ -668,13 +692,13 @@
         .tech__feature p { font-size: 0.8125rem; color: var(--text-dim); line-height: 1.6; max-width: 320px; }
         @media (max-width: 1024px) { .tech__feature p { max-width: 100%; } }
 
-        /* Gallery Panel */
+        /* FIX #5: Gallery Panel - reduce width to eliminate blank space */
         .panel-gallery {
-            width: 220vw;
-            background: var(--bg-elevated);
+            width: 180vw;
+            background: #f5f5f0;
             padding-top: 120px;
         }
-        @media (max-width: 768px) { .panel-gallery { width: 380vw; padding-top: 100px; } }
+        @media (max-width: 768px) { .panel-gallery { width: 320vw; padding-top: 100px; } }
 
         .gallery__header {
             position: absolute;
@@ -682,7 +706,16 @@
             z-index: 5;
         }
         @media (max-width: 768px) { .gallery__header { top: 30px; left: 24px; } }
-        .gallery__header .section__title { font-size: clamp(1.75rem, 3.5vw, 2.5rem); }
+        .gallery__header .section__title { 
+            font-size: clamp(1.75rem, 3.5vw, 2.5rem); 
+            color: #0a0a0a;
+        }
+        .gallery__header .section__label {
+            color: #0a0a0a;
+        }
+        .gallery__header .section__label::before {
+            background: #0a0a0a;
+        }
 
         .gallery__track {
             display: flex;
@@ -696,13 +729,18 @@
         .gallery__item {
             flex-shrink: 0;
             width: clamp(280px, 30vw, 420px);
-            aspect-ratio: 3/4;
+            aspect-ratio: 4/5;
             position: relative;
             overflow: hidden;
-            border: 1px solid var(--border);
-            transition: border-color 0.4s ease;
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
-        .gallery__item:hover { border-color: var(--gold-dim); }
+        .gallery__item:hover { 
+            border-color: var(--gold); 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+        }
         .gallery__item img {
             width: 100%; height: 100%;
             object-fit: cover;
@@ -713,7 +751,7 @@
         .gallery__overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+            background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
             padding: 28px;
             display: flex;
             flex-direction: column;
@@ -792,9 +830,9 @@
             width: 6px; height: 6px;
             background: var(--red);
             border-radius: 50%;
-            animation: blink 1s ease-in-out infinite;
+            animation: recBlink 4s ease-in-out infinite;
         }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes recBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         /* ══════════════════════════════════════════════════════════════
            STATEMENT SECTION
@@ -877,10 +915,16 @@
             margin-bottom: 50px;
             padding: 0 24px;
         }
-        .marquee { display: flex; gap: 20px; animation: marquee 35s linear infinite; }
+        
+        /* FIX #6: Marquee MUCH slower - 120s instead of 35s */
+        .marquee { 
+            display: flex; 
+            gap: 20px; 
+            animation: anim-marquee 30s linear infinite; 
+        }
         .marquee:hover { animation-play-state: paused; }
 
-        @keyframes marquee {
+        @keyframes anim-marquee {
             from { transform: translateX(0); }
             to { transform: translateX(-50%); }
         }
@@ -1087,15 +1131,12 @@
         }
 
         /* Reduced Motion */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
+        @media
     </style>
 </head>
 <body>
+    <!-- VERSION 14.0 - NORMAL SPEED TEST -->
+    <!-- version 14 -->
     <div class="cursor">
         <div class="cursor__dot"></div>
         <div class="cursor__ring"></div>
@@ -1241,9 +1282,9 @@
                 <div class="h-panel panel-tech">
                     <div class="tech__grid">
                         <div class="tech__visual">
-                            <div class="tech__ring tech__ring--3"><span class="tech__ring-dot"></span></div>
-                            <div class="tech__ring tech__ring--1"><span class="tech__ring-dot"></span></div>
-                            <div class="tech__ring tech__ring--2"></div>
+                            <div class="tech__ring tech__ring--3"><span class="tech__ring-dot dot-1"></span><span class="tech__ring-dot dot-2"></span><span class="tech__ring-dot dot-3"></span><span class="tech__ring-dot dot-4"></span></div>
+                            <div class="tech__ring tech__ring--1"><span class="tech__ring-dot dot-1"></span><span class="tech__ring-dot dot-2"></span><span class="tech__ring-dot dot-3"></span><span class="tech__ring-dot dot-4"></span></div>
+                            <div class="tech__ring tech__ring--2"><span class="tech__ring-dot dot-1"></span><span class="tech__ring-dot dot-2"></span><span class="tech__ring-dot dot-3"></span><span class="tech__ring-dot dot-4"></span></div>
                             <div class="tech__video-wrap">
                                 <video class="tech__video" autoplay muted loop playsinline>
                                     <source src="content/ShortenM4_compressed.mp4" type="video/mp4">
@@ -1467,6 +1508,21 @@
     <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
     <script>
+    
+    // Log all computed animation durations
+    window.addEventListener("load", function() {
+        setTimeout(function() {
+            var badge = document.querySelector(".hero__badge-dot");
+            var scroll = document.querySelector(".hero__scroll-line");
+            var ring1 = document.querySelector(".tech__ring--1");
+            var marquee = document.querySelector(".marquee");
+            
+            
+            if(typeof gsap !== "undefined") {
+            }
+        }, 2000);
+    });
+
     (function() {
         'use strict';
         gsap.registerPlugin(ScrollTrigger);
@@ -1505,6 +1561,9 @@
         gsap.set('.hero__ctas', { opacity: 0, y: 30 });
         gsap.set('.hero__scroll', { opacity: 0 });
         gsap.set('.corner', { opacity: 0 });
+        
+        // Tech visual initial state - visible by default
+        gsap.set('.tech__visual', { opacity: 1, scale: 1 });
 
         // ═══════════════════════════════════════════════════════════
         // PRELOADER
@@ -1543,8 +1602,9 @@
             // Lenis
             const lenis = new Lenis({ duration: 1.2, smoothWheel: true });
             lenis.on('scroll', ScrollTrigger.update);
-            gsap.ticker.add(t => lenis.raf(t * 1000));
-            gsap.ticker.lagSmoothing(0);
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); } requestAnimationFrame(raf);
+            // DISABLED: gsap.ticker.add(t => lenis.raf(t * 1000));
+            // DISABLED: gsap.ticker.lagSmoothing(500, 33);
 
             // Nav scroll
             window.addEventListener('scroll', () => {
@@ -1611,7 +1671,7 @@
             );
 
             // ═══════════════════════════════════════════════════════════
-            // HORIZONTAL SCROLL
+            // HORIZONTAL SCROLL WITH TECH PANEL PAUSE
             // ═══════════════════════════════════════════════════════════
             const hSection = document.querySelector('.horizontal');
             const hWrapper = document.querySelector('.horizontal__wrapper');
@@ -1620,28 +1680,37 @@
             let totalW = 0;
             panels.forEach(p => totalW += p.offsetWidth);
             const scrollDist = totalW - window.innerWidth;
+            
+            // Extra scroll distance for the pause on tech panel
+            const pauseDuration = window.innerHeight * 0.3; // Half viewport height of pause
+            const totalScrollDist = scrollDist + pauseDuration;
 
-            gsap.to(hWrapper, {
-                x: -scrollDist,
-                ease: 'none',
+            // Timeline for horizontal scroll with pause
+            const hScrollTL = gsap.timeline({
                 scrollTrigger: {
                     trigger: hSection,
                     pin: true,
                     scrub: 1,
-                    end: '+=' + scrollDist,
+                    end: '+=' + totalScrollDist,
                     invalidateOnRefresh: true
                 }
             });
+            
+            // Stay on tech panel for first portion (the pause)
+            hScrollTL.to(hWrapper, {
+                x: 0,
+                duration: 0.3,
+                ease: 'none'
+            });
+            
+            // Then scroll to gallery
+            hScrollTL.to(hWrapper, {
+                x: -scrollDist,
+                duration: 0.7,
+                ease: 'none'
+            });
 
-            // Tech panel reveal
-            gsap.fromTo('.tech__visual',
-                { scale: 0.85, opacity: 0, rotation: -10 },
-                { 
-                    scale: 1, opacity: 1, rotation: 0, duration: 1,
-                    scrollTrigger: { trigger: hSection, start: 'top 60%' }
-                }
-            );
-
+            // Tech panel - just animate in the text, keep visual always visible
             gsap.fromTo('.tech__label, .tech__title, .tech__feature',
                 { opacity: 0, x: 50 },
                 { 
@@ -1650,7 +1719,7 @@
                 }
             );
 
-            // Gallery items
+            // Gallery items - entrance animation
             gsap.fromTo('.gallery__item',
                 { y: 60, opacity: 0 },
                 { 
@@ -1658,6 +1727,23 @@
                     scrollTrigger: { trigger: hSection, start: 'top 40%' }
                 }
             );
+            
+            // Gallery images - parallax effect (staggered, slower)
+            document.querySelectorAll('.gallery__item').forEach((card, i) => {
+                gsap.fromTo(card,
+                    { x: 100 + (i * 80) },
+                    {
+                        x: 0 - (i * 20),
+                        ease: 'none',
+                        scrollTrigger: {
+                            trigger: hSection,
+                            start: 'top top',
+                            end: 'bottom top',
+                            scrub: 2
+                        }
+                    }
+                );
+            });
 
             // ═══════════════════════════════════════════════════════════
             // DEMO SECTION
