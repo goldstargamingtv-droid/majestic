@@ -773,8 +773,9 @@
             inset: 0;
             z-index: 3;
             background: 
-                radial-gradient(ellipse 80% 50% at 50% 50%, transparent 0%, var(--bg) 85%),
-                linear-gradient(180deg, transparent 0%, var(--bg) 95%);
+                radial-gradient(ellipse 85% 55% at 50% 50%, transparent 0%, var(--bg) 90%),
+                linear-gradient(180deg, transparent 0%, var(--bg) 98%);
+            opacity: 0.85;
         }
 
         /* Holographic Targeting Reticle - GLOWING WHITE */
@@ -1439,33 +1440,38 @@
         /* FIX #3: Tech visual - ensure it's visible */
         .tech__visual {
             position: relative;
-            aspect-ratio: 1;
-            max-width: 450px;
+            aspect-ratio: 16/9;
+            max-width: 550px;
             width: 100%;
             margin: 0 auto;
         }
         .tech__video-wrap {
             position: absolute;
-            inset: 18%;
-            border-radius: 50%;
+            inset: 10%;
+            border-radius: 8px;
             overflow: hidden;
-            border: 1px solid var(--gold-dim);
             box-shadow: 0 0 80px var(--gold-glow);
             z-index: 2;
+            background: #e0dfca;
         }
         .tech__video {
-            width: 100%; height: 100%;
+            width: calc(100% + 4px); 
+            height: calc(100% + 4px);
             object-fit: cover;
-            /* filter removed for performance */
+            display: block;
+            position: relative;
+            left: -2px;
+            top: -2px;
+            border-radius: 8px;
         }
         .tech__ring {
             position: absolute;
             border: 1px solid var(--gold-dim);
-            border-radius: 50%;
+            border-radius: 4px;
         }
         .tech__ring--1 { inset: 0; animation: anim-ring-1 30s linear infinite; }
-        .tech__ring--2 { inset: 10%; animation: anim-ring-2 25s linear infinite reverse; border-style: dashed; opacity: 0.3; }
-        .tech__ring--3 { inset: -6%; animation: anim-ring-3 40s linear infinite; border-color: var(--border); }
+        .tech__ring--2 { inset: 5%; animation: anim-ring-2 25s linear infinite reverse; border-style: dashed; opacity: 0.3; }
+        .tech__ring--3 { inset: -4%; animation: anim-ring-3 40s linear infinite; border-color: var(--border); }
         @keyframes anim-ring-1 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes anim-ring-2 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes anim-ring-3 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -1477,18 +1483,19 @@
             border-radius: 50%;
             box-shadow: 0 0 15px var(--gold-glow);
         }
-        .tech__ring--1 .dot-1 { top: 0; left: 50%; transform: translate(-50%, -50%); }
-        .tech__ring--1 .dot-2 { bottom: 0; left: 50%; transform: translate(-50%, 50%); }
-        .tech__ring--1 .dot-3 { top: calc(50% - 20px); left: 0; transform: translate(-50%, -50%); }
-        .tech__ring--1 .dot-4 { top: calc(50% - 20px); right: 0; transform: translate(50%, -50%); }
-        .tech__ring--2 .dot-1 { top: 0; left: 50%; transform: translate(-50%, -50%); }
-        .tech__ring--2 .dot-2 { top: calc(50% - 20px); right: 0; transform: translate(50%, -50%); }
-        .tech__ring--2 .dot-3 { bottom: 0; left: 50%; transform: translate(-50%, 50%); }
-        .tech__ring--2 .dot-4 { top: calc(50% - 20px); left: 0; transform: translate(-50%, -50%); }
-        .tech__ring--3 .dot-1 { top: 0; left: 50%; transform: translate(-50%, -50%); }
-        .tech__ring--3 .dot-2 { top: calc(50% - 20px); right: 0; transform: translate(50%, -50%); }
-        .tech__ring--3 .dot-3 { bottom: 0; left: 50%; transform: translate(-50%, 50%); }
-        .tech__ring--3 .dot-4 { top: calc(50% - 20px); left: 0; transform: translate(-50%, -50%); }
+        /* Corner dots for squares */
+        .tech__ring--1 .dot-1 { top: 0; left: 0; transform: translate(-50%, -50%); }
+        .tech__ring--1 .dot-2 { top: 0; right: 0; transform: translate(50%, -50%); }
+        .tech__ring--1 .dot-3 { bottom: 0; left: 0; transform: translate(-50%, 50%); }
+        .tech__ring--1 .dot-4 { bottom: 0; right: 0; transform: translate(50%, 50%); }
+        .tech__ring--2 .dot-1 { top: 0; left: 0; transform: translate(-50%, -50%); }
+        .tech__ring--2 .dot-2 { top: 0; right: 0; transform: translate(50%, -50%); }
+        .tech__ring--2 .dot-3 { bottom: 0; left: 0; transform: translate(-50%, 50%); }
+        .tech__ring--2 .dot-4 { bottom: 0; right: 0; transform: translate(50%, 50%); }
+        .tech__ring--3 .dot-1 { top: 0; left: 0; transform: translate(-50%, -50%); }
+        .tech__ring--3 .dot-2 { top: 0; right: 0; transform: translate(50%, -50%); }
+        .tech__ring--3 .dot-3 { bottom: 0; left: 0; transform: translate(-50%, 50%); }
+        .tech__ring--3 .dot-4 { bottom: 0; right: 0; transform: translate(50%, 50%); }
 
         .tech__label {
             font-size: 0.625rem;
@@ -2112,36 +2119,8 @@
             </div>
             
             <!-- Holographic Targeting Reticle -->
-            <div class="hero__reticle">
-                <div class="reticle__scan"></div>
-                <div class="reticle__outer"></div>
-                <div class="reticle__inner"></div>
-                <div class="reticle__crosshair"></div>
-                <div class="reticle__center"></div>
-                <div class="reticle__data reticle__data--top">TGT.LOCK</div>
-                <div class="reticle__data reticle__data--bottom">DIST: 2.4M</div>
-                <div class="reticle__bracket reticle__bracket--tl"></div>
-                <div class="reticle__bracket reticle__bracket--tr"></div>
-                <div class="reticle__bracket reticle__bracket--bl"></div>
-                <div class="reticle__bracket reticle__bracket--br"></div>
-                <div class="reticle__tick reticle__tick--n"></div>
-                <div class="reticle__tick reticle__tick--e"></div>
-                <div class="reticle__tick reticle__tick--s"></div>
-                <div class="reticle__tick reticle__tick--w"></div>
-                <!-- Cyan arrows pointing inward -->
-                <div class="reticle__arrow reticle__arrow--n"></div>
-                <div class="reticle__arrow reticle__arrow--s"></div>
-                <div class="reticle__arrow reticle__arrow--e"></div>
-                <div class="reticle__arrow reticle__arrow--w"></div>
-            </div>
             
             <div class="hero__overlay"></div>
-            
-            <!-- Subtle grid overlay on gun area -->
-            <div class="hero__grid-overlay"></div>
-            
-            <!-- Horizontal scanline across gun -->
-            <div class="hero__scanline"></div>
 
             <!-- Top-right schematic bracket -->
             <div class="hero__schematic-tr">
@@ -2164,15 +2143,6 @@
             </div>
             
             <!-- Right side measurement system -->
-            <div class="hero__measure-system">
-                <div class="measure__line"></div>
-                <div class="measure__bracket measure__bracket--top"></div>
-                <div class="measure__bracket measure__bracket--mid"></div>
-                <div class="measure__bracket measure__bracket--bottom"></div>
-                <span class="measure__value measure__value--top">0.00</span>
-                <span class="measure__value measure__value--mid">4.49</span>
-                <span class="measure__value measure__value--bottom">8.98</span>
-            </div>
             
             <!-- Data cluster mid-right -->
             <div class="hero__data-cluster">
@@ -2197,26 +2167,6 @@
                 </div>
             </div>
             
-            <!-- Diagonal connector -->
-            <div class="hero__connector">
-                <svg width="80" height="40" viewBox="0 0 80 40">
-                    <path class="connector__line" d="M0,40 L60,10 L80,10"/>
-                    <circle class="connector__dot" cx="0" cy="40" r="2"/>
-                    <circle class="connector__dot" cx="80" cy="10" r="2"/>
-                </svg>
-            </div>
-            
-            <!-- Curved arc measurement -->
-            <div class="hero__arc">
-                <svg width="300" height="150" viewBox="0 0 300 150">
-                    <path class="arc__path" d="M20,140 Q150,20 280,140"/>
-                    <line class="arc__tick" x1="50" y1="115" x2="55" y2="105"/>
-                    <line class="arc__tick" x1="100" y1="75" x2="108" y2="68"/>
-                    <line class="arc__tick" x1="150" y1="55" x2="150" y2="45"/>
-                    <line class="arc__tick" x1="200" y1="75" x2="192" y2="68"/>
-                    <line class="arc__tick" x1="250" y1="115" x2="245" y2="105"/>
-                </svg>
-            </div>
 
             <!-- Right side HUD data panel -->
             <div class="hero__hud-panel">
